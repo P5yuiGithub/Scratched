@@ -22,6 +22,17 @@
     z-index: 2;
 }
 
+#node {
+    position: fixed;
+    top: 50%;
+    bottom: 50%;
+    width: 200px;
+    height: 150px;
+    background-color: rgb(95, 104, 108);
+    border-radius: 6%;
+    cursor: grab
+}
+
 #overlay {
     position: fixed;
     inset: 0;

@@ -1,8 +1,11 @@
 import './style.css';
+import './node.ts';
 
 const grid = document.getElementById('bg-grid') as HTMLDivElement;
 const nodeSelector = document.getElementById('node-selector') as HTMLDivElement;
 const overlay = document.getElementById('overlay') as HTMLDivElement;
+const node = document.getElementById('node') as HTMLDivElement;
+//const otherNode = new Node()
 
 let dragging = false;
 let startPos = {x: 0, y: 0};
@@ -10,8 +13,31 @@ let currentPos = {x: 0, y: 0};
 let targetPos = {x: 0, y: 0};
 let dragSpeed = 0.1;
 
+let draggingNode = false
+let offsetPos = {x: 0, y: 0}
+
 let currentZoom = 1;
 let targetZoom = 1;
+
+node.addEventListener('mousedown', (event: MouseEvent) => {
+    draggingNode = true;
+    const rect = node.getBoundingClientRect();
+    offsetPos.x = event.clientX - rect.left;
+    offsetPos.y = event.clientY - rect.top;
+    node.style.cursor = 'grabbing';
+});
+
+document.addEventListener('mousemove', (event: MouseEvent) => {
+    if (draggingNode) {
+        node.style.left = `${event.clientX - offsetPos.x}px`;
+        node.style.top = `${event.clientY - offsetPos.y}px`;
+    };
+});
+
+node.addEventListener('mouseup', (event: MouseEvent) => {
+    draggingNode = false;
+    node.style.cursor = 'grab';
+});
 
 grid.addEventListener('mousedown', (event: MouseEvent) => {
     if (nodeSelector.style.display !== 'block') {
