@@ -1,13 +1,25 @@
 #bg-grid {
-    overflow: hidden;
+    width: 10000px;
+    height: 10000px;
+    background-size: 120px 120px;
+    background-image:
+        linear-gradient(to right, rgb(60,72,79) 1px, transparent 1px),
+        linear-gradient(to bottom, rgb(60,72,79) 1px, transparent 1px);
+    background-color: rgb(30,38,43);
+}
+
+#viewport {
     width: 100vw;
     height: 100vh;
-    background-size: 120px 120px;
-    background-image: 
-        linear-gradient(to right, rgb(60, 72, 79) 1px, transparent 1px),
-        linear-gradient(to bottom, rgb(60, 72, 79) 1px, transparent 1px);
-    background-color: rgb(30, 38, 43);
-    cursor: grab
+    overflow: hidden;
+    position: relative;
+}
+
+#world {
+    position: absolute;
+    width: 10000px;
+    height: 10000px;
+    transform-origin: 0 0;
 }
 
 #node-selector {
@@ -20,6 +32,25 @@
     background-color: rgb(27, 29, 30);
     border-radius: 6%;
     z-index: 2;
+}
+
+#selector-button {
+    position: fixed;
+    width: 500px;
+    height: 100px;
+    background-color: rgb(7, 7, 7);
+    border: 2px solid white;
+}
+
+.node {
+    position: fixed;
+    top: 50%;
+    bottom: 50%;
+    width: 200px;
+    height: 150px;
+    background-color: rgb(95, 104, 108);
+    border-radius: 6%;
+    cursor: grab
 }
 
 #overlay {
