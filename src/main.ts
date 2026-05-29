@@ -1,60 +1,71 @@
-import './style.css'
-import typescriptLogo from './assets/typescript.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import { setupCounter } from './counter.ts'
+import './style.css';
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-<section id="center">
-  <div class="hero">
-    <img src="${heroImg}" class="base" width="170" height="179">
-    <img src="${typescriptLogo}" class="framework" alt="TypeScript logo"/>
-    <img src="${viteLogo}" class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/main.ts</code> and save to test <code>HMR</code></p>
-  </div>
-  <button id="counter" type="button" class="counter"></button>
-</section>
+const grid = document.getElementById('bg-grid') as HTMLDivElement;
+const nodeSelector = document.getElementById('node-selector') as HTMLDivElement;
+const overlay = document.getElementById('overlay') as HTMLDivElement;
 
-<div class="ticks"></div>
+let dragging = false;
+let startPos = {x: 0, y: 0};
+let currentPos = {x: 0, y: 0};
+let targetPos = {x: 0, y: 0};
+let dragSpeed = 0.1;
 
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#documentation-icon"></use></svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank">
-          <img class="logo" src="${viteLogo}" alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://www.typescriptlang.org" target="_blank">
-          <img class="button-icon" src="${typescriptLogo}" alt="">
-          Learn more
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#social-icon"></use></svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li><a href="https://github.com/vitejs/vite" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#github-icon"></use></svg>GitHub</a></li>
-      <li><a href="https://chat.vite.dev/" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#discord-icon"></use></svg>Discord</a></li>
-      <li><a href="https://x.com/vite_js" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#x-icon"></use></svg>X.com</a></li>
-      <li><a href="https://bsky.app/profile/vite.dev" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#bluesky-icon"></use></svg>Bluesky</a></li>
-    </ul>
-  </div>
-</section>
+let currentZoom = 1;
+let targetZoom = 1;
 
-<div class="ticks"></div>
-<section id="spacer"></section>
-`
+grid.addEventListener('mousedown', (event: MouseEvent) => {
+    if (nodeSelector.style.display !== 'block') {
+        dragging = true;
+        startPos.x = event.clientX - targetPos.x;
+        startPos.y = event.clientY - targetPos.y;
+        grid.style.cursor = 'grabbing';
+    };
+});
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+overlay.addEventListener('click', (event: MouseEvent) => {
+    nodeSelector.classList.add('hidden');
+    overlay.classList.add('hidden');
+});
+
+grid.addEventListener('dblclick', (event: MouseEvent) => {
+    nodeSelector.classList.remove('hidden');
+    overlay.classList.remove('hidden');
+});
+
+window.addEventListener('mousemove', (event: MouseEvent) => {
+    if (!dragging) return;
+    targetPos.x = event.clientX - startPos.x;
+    targetPos.y = event.clientY - startPos.y;
+});
+
+window.addEventListener('mouseup', () => {
+    dragging = false;
+    grid.style.cursor = 'grab';
+});
+
+window.addEventListener('wheel', (event: WheelEvent) => {
+    if (nodeSelector.style.display === 'block') return
+    event.preventDefault();
+    const prevZoom = targetZoom;
+    targetZoom *= 1 - event.deltaY / 2000;
+    targetZoom = Math.max(0.1, Math.min(10, targetZoom));
+    const zoomFactor = targetZoom / prevZoom;
+    targetPos.x = event.clientX - (event.clientX - targetPos.x) * zoomFactor;
+    targetPos.y = event.clientY - (event.clientY - targetPos.y) * zoomFactor;
+}, { passive: false });
+
+const animate = () => {
+    currentZoom += (targetZoom - currentZoom) * 0.1;
+    currentPos.x += (targetPos.x - currentPos.x) * dragSpeed;
+    currentPos.y += (targetPos.y - currentPos.y) * dragSpeed;
+
+    const gridSize = 120 * currentZoom;
+    const x = currentPos.x % gridSize;
+    const y = currentPos.y % gridSize;
+    grid.style.backgroundSize = `${gridSize}px ${gridSize}px`;
+    grid.style.backgroundPosition = `${x}px ${y}px`;
+
+    requestAnimationFrame(animate);
+};
+
+animate();
