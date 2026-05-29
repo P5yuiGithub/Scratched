@@ -1,11 +1,11 @@
 import './style.css';
-import './node.ts';
+import {DraggableNode} from './node.ts';
 
 const grid = document.getElementById('bg-grid') as HTMLDivElement;
 const nodeSelector = document.getElementById('node-selector') as HTMLDivElement;
 const overlay = document.getElementById('overlay') as HTMLDivElement;
-const node = document.getElementById('node') as HTMLDivElement;
-//const otherNode = new Node()
+const world = document.getElementById('world') as HTMLDivElement;
+const nodeButton = document.getElementById('selector-button') as HTMLDivElement;
 
 let dragging = false;
 let startPos = {x: 0, y: 0};
@@ -13,30 +13,32 @@ let currentPos = {x: 0, y: 0};
 let targetPos = {x: 0, y: 0};
 let dragSpeed = 0.1;
 
-let draggingNode = false
-let offsetPos = {x: 0, y: 0}
-
 let currentZoom = 1;
 let targetZoom = 1;
 
-node.addEventListener('mousedown', (event: MouseEvent) => {
-    draggingNode = true;
-    const rect = node.getBoundingClientRect();
-    offsetPos.x = event.clientX - rect.left;
-    offsetPos.y = event.clientY - rect.top;
-    node.style.cursor = 'grabbing';
-});
+let nodePlacePos = {x: 0, y: 0}
 
-document.addEventListener('mousemove', (event: MouseEvent) => {
-    if (draggingNode) {
-        node.style.left = `${event.clientX - offsetPos.x}px`;
-        node.style.top = `${event.clientY - offsetPos.y}px`;
-    };
-});
+const WORLD_SIZE = 10000;
 
-node.addEventListener('mouseup', (event: MouseEvent) => {
-    draggingNode = false;
-    node.style.cursor = 'grab';
+targetPos.x = window.innerWidth / 2 - WORLD_SIZE / 2;
+targetPos.y = window.innerHeight / 2 - WORLD_SIZE / 2;
+
+currentPos.x = targetPos.x;
+currentPos.y = targetPos.y;
+
+nodeButton.addEventListener('click', (event: MouseEvent) => {
+    const node = new DraggableNode(currentPos, () => currentZoom);
+
+    const worldX = (nodePlacePos.x - currentPos.x) / currentZoom;
+    const worldY = (nodePlacePos.y - currentPos.y) / currentZoom;
+
+    node.element.style.left = `${worldX}px`;
+    node.element.style.top = `${worldY}px`;
+
+    world.appendChild(node.element);
+
+    nodeSelector.classList.add('hidden');
+    overlay.classList.add('hidden');
 });
 
 grid.addEventListener('mousedown', (event: MouseEvent) => {
@@ -56,6 +58,8 @@ overlay.addEventListener('click', (event: MouseEvent) => {
 grid.addEventListener('dblclick', (event: MouseEvent) => {
     nodeSelector.classList.remove('hidden');
     overlay.classList.remove('hidden');
+
+    nodePlacePos = {x: event.clientX, y: event.clientY}
 });
 
 window.addEventListener('mousemove', (event: MouseEvent) => {
@@ -88,8 +92,7 @@ const animate = () => {
     const gridSize = 120 * currentZoom;
     const x = currentPos.x % gridSize;
     const y = currentPos.y % gridSize;
-    grid.style.backgroundSize = `${gridSize}px ${gridSize}px`;
-    grid.style.backgroundPosition = `${x}px ${y}px`;
+    world.style.transform = `translate(${currentPos.x}px, ${currentPos.y}px) scale(${currentZoom})`;
 
     requestAnimationFrame(animate);
 };
