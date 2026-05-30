@@ -1,11 +1,13 @@
 import './style.css';
 import {DraggableNode} from './node.ts';
 import {registry} from './registry.ts';
+import {state} from './state.ts';
 
 const grid = document.getElementById('bg-grid') as HTMLDivElement;
 const nodeSelector = document.getElementById('node-selector') as HTMLDivElement;
 const overlay = document.getElementById('overlay') as HTMLDivElement;
 const world = document.getElementById('world') as HTMLDivElement;
+const svg = document.getElementById('connections') as unknown as SVGSVGElement;
 
 let dragging = false;
 let startPos = {x: 0, y: 0};
@@ -70,6 +72,26 @@ grid.addEventListener('dblclick', (event: MouseEvent) => {
 });
 
 window.addEventListener('mousemove', (event: MouseEvent) => {
+    if (state.connectionPort) {
+        const zoom = currentZoom;
+        const r1 = state.connectionPort.getBoundingClientRect();
+        const x1 = (r1.left + r1.width / 2 - currentPos.x) / zoom;
+        const y1 = (r1.top + r1.height / 2 - currentPos.y) / zoom;
+        const x2 = (event.clientX - currentPos.x) / zoom;
+        const y2 = (event.clientY - currentPos.y) / zoom;
+
+        let pendingPath = svg.querySelector('#pending-connection') as SVGPathElement | null;
+        if (!pendingPath) {
+            pendingPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            pendingPath.id = 'pending-connection';
+            pendingPath.setAttribute('stroke', 'white');
+            pendingPath.setAttribute('stroke-width', '2');
+            pendingPath.setAttribute('fill', 'none');
+            svg.appendChild(pendingPath);
+        }
+        pendingPath.setAttribute('d', `M ${x1} ${y1} C ${x1 + 100} ${y1}, ${x2 - 100} ${y2}, ${x2} ${y2}`);
+    }
+
     if (!dragging) return;
     targetPos.x = event.clientX - startPos.x;
     targetPos.y = event.clientY - startPos.y;
@@ -78,6 +100,8 @@ window.addEventListener('mousemove', (event: MouseEvent) => {
 window.addEventListener('mouseup', () => {
     dragging = false;
     grid.style.cursor = 'grab';
+    document.getElementById('pending-connection')?.remove();
+    state.connectionPort = null;
 });
 
 window.addEventListener('wheel', (event: WheelEvent) => {

@@ -22,6 +22,16 @@
     transform-origin: 0 0;
 }
 
+#connections {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: visible;
+}
+
 #node-selector {
     position: fixed;
     top: 50%;
@@ -83,7 +93,7 @@
     width: 12px;
     height: 12px;
     top: 50%;
-    left: 3%;
+    left: -2%;
 }
 
 .output-port {
@@ -93,7 +103,7 @@
     width: 12px;
     height: 12px;
     top: 50%;
-    left: 92%;
+    left: 98%;
 }
 
 #overlay {

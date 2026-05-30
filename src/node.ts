@@ -1,4 +1,7 @@
 import {registry} from './registry.ts';
+import {state} from './state.ts';
+
+const svg = document.getElementById('connections') as unknown as SVGSVGElement;
 
 export class DraggableNode {
     element: HTMLDivElement;
@@ -34,6 +37,34 @@ export class DraggableNode {
                     input.className = "input-port";
                     input.style.top = `${100 / (nodeData.inputs.length + 1) * i}%`;
                     this.element.appendChild(input);
+                    
+                    input.addEventListener('mousedown', (event: MouseEvent) => {
+                        state.connectionPort = input;
+                        event.stopPropagation();
+                    });
+                    input.addEventListener('mouseup', (event: MouseEvent) => {
+                        if (!state.connectionPort) return;
+                        if (state.connectionPort.className !== "output-port") return;
+    
+                        const zoom = this.getZoom();
+                        
+                        const r1 = state.connectionPort.getBoundingClientRect();
+                        const r2 = input.getBoundingClientRect();
+                        
+                        const x1 = (r1.left + r1.width / 2 - this.cameraPos.x) / zoom;
+                        const y1 = (r1.top + r1.height / 2 - this.cameraPos.y) / zoom;
+                        const x2 = (r2.left + r2.width / 2 - this.cameraPos.x) / zoom;
+                        const y2 = (r2.top + r2.height / 2 - this.cameraPos.y) / zoom;
+                        
+                        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        path.setAttribute('d', `M ${x1} ${y1} C ${x1 + 100} ${y1}, ${x2 - 100} ${y2}, ${x2} ${y2}`);
+                        path.setAttribute('stroke', 'white');
+                        path.setAttribute('stroke-width', '2');
+                        path.setAttribute('fill', 'none');
+                        svg.appendChild(path);
+                        
+                        state.connectionPort = null;
+                    });
                 }
             };
             if (nodeData.outputs) {
@@ -42,6 +73,34 @@ export class DraggableNode {
                     output.className = "output-port";
                     output.style.top = `${100 / (nodeData.outputs.length + 1) * i}%`;
                     this.element.appendChild(output);
+
+                    output.addEventListener('mousedown', (event: MouseEvent) => {
+                        state.connectionPort = output;
+                        event.stopPropagation();
+                    });
+                    output.addEventListener('mouseup', (event: MouseEvent) => {
+                        if (!state.connectionPort) return;
+                        if (state.connectionPort.className !== "input-port") return;
+    
+                        const zoom = this.getZoom();
+                        
+                        const r1 = state.connectionPort.getBoundingClientRect();
+                        const r2 = output.getBoundingClientRect();
+                        
+                        const x1 = (r1.left + r1.width / 2 - this.cameraPos.x) / zoom;
+                        const y1 = (r1.top + r1.height / 2 - this.cameraPos.y) / zoom;
+                        const x2 = (r2.left + r2.width / 2 - this.cameraPos.x) / zoom;
+                        const y2 = (r2.top + r2.height / 2 - this.cameraPos.y) / zoom;
+                        
+                        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        path.setAttribute('d', `M ${x1} ${y1} C ${x1 + 100} ${y1}, ${x2 - 100} ${y2}, ${x2} ${y2}`);
+                        path.setAttribute('stroke', 'white');
+                        path.setAttribute('stroke-width', '2');
+                        path.setAttribute('fill', 'none');
+                        svg.appendChild(path);
+                        
+                        state.connectionPort = null;
+                    });
                 }
             };
         }
