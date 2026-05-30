@@ -1,13 +1,25 @@
 #bg-grid {
-    overflow: hidden;
+    width: 10000px;
+    height: 10000px;
+    background-size: 120px 120px;
+    background-image:
+        linear-gradient(to right, rgb(60,72,79) 1px, transparent 1px),
+        linear-gradient(to bottom, rgb(60,72,79) 1px, transparent 1px);
+    background-color: rgb(30,38,43);
+}
+
+#viewport {
     width: 100vw;
     height: 100vh;
-    background-size: 120px 120px;
-    background-image: 
-        linear-gradient(to right, rgb(60, 72, 79) 1px, transparent 1px),
-        linear-gradient(to bottom, rgb(60, 72, 79) 1px, transparent 1px);
-    background-color: rgb(30, 38, 43);
-    cursor: grab
+    overflow: hidden;
+    position: relative;
+}
+
+#world {
+    position: absolute;
+    width: 10000px;
+    height: 10000px;
+    transform-origin: 0 0;
 }
 
 #node-selector {
@@ -20,6 +32,68 @@
     background-color: rgb(27, 29, 30);
     border-radius: 6%;
     z-index: 2;
+}
+
+.selector-button {
+    width: 500px;
+    height: 100px;
+    background-color: rgb(27, 29, 30);
+    display: flex;
+    align-items: center;
+    padding-left: 12px;
+    color: white;
+    font-size: 16px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.selector-button:hover {
+    background-color: rgb(158, 158, 158);
+}
+
+.node {
+    position: fixed;
+    top: 50%;
+    bottom: 50%;
+    width: 300px;
+    height: 200px;
+    background-color: rgb(39, 44, 46);
+    border: 1px solid rgb(76, 80, 88);
+    border-radius: 12px;
+    cursor: grab
+}
+
+.node-text {
+    position: relative;
+    width: 298px;
+    height: 40px;
+    background-color: rgb(24, 24, 24);
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    align-items: center;
+    padding-left: 12px;
+    color: white;
+    font-size: 16px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.input-port {
+    position: absolute;
+    background-color: rgb(6, 128, 249);
+    border-radius: 100%;
+    width: 12px;
+    height: 12px;
+    top: 50%;
+    left: 3%;
+}
+
+.output-port {
+    position: absolute;
+    background-color: rgb(249, 140, 6);
+    border-radius: 100%;
+    width: 12px;
+    height: 12px;
+    top: 50%;
+    left: 92%;
 }
 
 #overlay {
